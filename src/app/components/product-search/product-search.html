@@ -1,0 +1,195 @@
+<div class="search-container">
+  <h2>Ajouter un produit</h2>
+
+  <div class="search-bar">
+    <mat-form-field appearance="outline">
+      <mat-label>Code-barres</mat-label>
+      <input matInput [(ngModel)]="barcode" placeholder="Ex: 3017624010701" (keyup.enter)="search()" />
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="search()" [disabled]="loading()">
+      Chercher
+    </button>
+  </div>
+  @if(loading()==true) {
+    <div class="loading-spinner">
+        <p>Chargement du produit...</p>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <p class="error-message" role="alert">{{ errorMessage() }}</p>
+  }
+
+  @if (product$ | async; as response) {
+    @if (response.product; as prod) {
+      <mat-card class="product-card">
+        <mat-card-header>
+          <mat-card-title>{{ prod.product_name || 'Nom inconnu' }}</mat-card-title>
+          <mat-card-subtitle>{{ prod.brands || 'Marque non renseignée' }}</mat-card-subtitle>
+        </mat-card-header>
+
+        @if (prod.image_front_url) {
+          <img mat-card-image [src]="prod.image_front_url" alt="Photo du produit" class="product-image" />
+        }
+
+        <mat-card-content>
+          @if (prod.categories_tags && prod.categories_tags.length > 0) {
+            <p><strong>Catégories :</strong> {{ prod.categories_tags.join(', ') }}</p>  
+          }
+          <p>Nutrition Score : {{ prod.nutriscore_grade || 'not specified' }}</p>
+          <hr class="separator" />
+
+          <h3>Stock MyPantry</h3>
+          <div class="pantry-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Quantité</mat-label>
+              <input matInput type="number" [(ngModel)]="quantity" min="1" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Unité</mat-label>
+              <input matInput [(ngModel)]="unit" placeholder="ex: pot, paquet, kg" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Péremption</mat-label>
+              <input matInput type="date" [(ngModel)]="expirationDate" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Seuil minimum</mat-label>
+              <input matInput type="number" [(ngModel)]="minThreshold" min="0" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Emplacement</mat-label>
+              <input matInput [(ngModel)]="location" placeholder="ex: Placard, Frigo" />
+            </mat-form-field>
+          </div>
+
+          @if (validationError()) {
+            <p class="validation-error" role="alert">{{ validationError() }}</p>
+          }
+        </mat-card-content>
+
+        <mat-card-actions align="end">
+          <button mat-raised-button color="accent" (click)="addToPantry(prod)">
+            Ajouter
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    }
+    @else {
+    <H1>Produit non disponible</H1>
+    <!-- <img src="image.png" alt="No product found" class="not-found-image"  style="max-width: 50%; height: auto; position: relative; top: 50%; left: 50%; " /> -->
+    }
+  }
+
+  <section class="pantry-list">
+    <h2>Mon stock</h2>
+
+    <div class="pantry-filters">
+      <mat-form-field appearance="outline">
+        <mat-label>Catégorie</mat-label>
+        <mat-select
+          [ngModel]="categoryFilter.value"
+          (ngModelChange)="categoryFilter.next($event)">
+          <mat-option value="">Toutes les catégories</mat-option>
+          @if (categoryOptions$ | async; as categories) {
+            @for (category of categories; track category) {
+              <mat-option [value]="category">{{ category }}</mat-option>
+            }
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Emplacement</mat-label>
+        <mat-select
+          [ngModel]="locationFilter.value"
+          (ngModelChange)="locationFilter.next($event)">
+          <mat-option value="">Tous les emplacements</mat-option>
+          @if (locationOptions$ | async; as locations) {
+            @for (locationOption of locations; track locationOption) {
+              <mat-option [value]="locationOption">{{ locationOption }}</mat-option>
+            }
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Expiration</mat-label>
+        <mat-select
+          [ngModel]="expirationSort.value"
+          (ngModelChange)="expirationSort.next($event)">
+          <mat-option value="asc">Plus proche en premier</mat-option>
+          <mat-option value="desc">Plus éloignée en premier</mat-option>
+          <mat-option value="">Aucun tri</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (filteredProducts$ | async; as products) {
+      @if (products.length > 0) {
+        @for (product of products; track product.id) {
+          <mat-card class="pantry-product-card">
+            <mat-card-header>
+              <mat-card-title>{{ product.name }}</mat-card-title>
+              <mat-card-subtitle>{{ product.brand || 'Marque inconnue' }}</mat-card-subtitle>
+            </mat-card-header>
+
+            @if (product.image) {
+              <img
+                mat-card-image
+                [src]="product.image"
+                [alt]="product.name"
+                class="pantry-product-image"
+              />
+            }
+
+            <mat-card-content>
+              <div class="pantry-grid">
+                <mat-form-field appearance="outline">
+                  <mat-label>Quantité</mat-label>
+                  <input matInput type="number" [(ngModel)]="product.quantity" min="0" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Unité</mat-label>
+                  <input matInput [(ngModel)]="product.unit" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Péremption</mat-label>
+                  <input matInput type="date" [(ngModel)]="product.expirationDate" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Seuil minimum</mat-label>
+                  <input matInput type="number" [(ngModel)]="product.minQuantity" min="0" />
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Emplacement</mat-label>
+                  <input matInput [(ngModel)]="product.location" />
+                </mat-form-field>
+              </div>
+            </mat-card-content>
+
+            <mat-card-actions align="end">
+              <button mat-raised-button color="primary" (click)="updatePantryProduct(product)">
+                Modifier
+              </button>
+              <button mat-raised-button color="warn" (click)="deletePantryProduct(product)">
+                Supprimer
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        }
+      } @else {
+        <p>Aucun produit ne correspond aux filtres.</p>
+      }
+    }
+  </section>
+</div>

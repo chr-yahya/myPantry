@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /products/{productId} {
+      // 1. Lecture : uniquement si connecté et propriétaire
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+
+      // 2. Création : le document créé doit porter le UID de l'utilisateur connecté
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+
+      // 3. Mise à jour : le propriétaire ne peut pas modifier le champ userId
+      allow update: if request.auth != null 
+                    && resource.data.userId == request.auth.uid 
+                    && request.resource.data.userId == resource.data.userId;
+
+      // 4. Suppression : seul le propriétaire
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+  }
+}

@@ -1,0 +1,137 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  padding: 1rem;
+  box-sizing: border-box;
+  background: #f4f7f5;
+  color: #20352b;
+  font-family: Inter, Roboto, "Helvetica Neue", sans-serif;
+}
+
+.auth-container {
+  width: min(100%, 28rem);
+  margin: 3rem auto;
+  padding: clamp(1.5rem, 5vw, 2.5rem);
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid #dfe9e2;
+  border-radius: 1rem;
+  box-shadow: 0 1rem 2.5rem rgba(32, 53, 43, 0.08);
+}
+
+h2 {
+  margin: 0 0 1.75rem;
+  color: #20352b;
+  font-size: clamp(1.6rem, 4vw, 2rem);
+  line-height: 1.2;
+  text-align: center;
+}
+
+form {
+  display: grid;
+  gap: 1rem;
+}
+
+form > div {
+  display: grid;
+  gap: 0.45rem;
+}
+
+label {
+  color: #365244;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  box-sizing: border-box;
+  border: 1px solid #c9d8ce;
+  border-radius: 0.5rem;
+  background: #fbfdfb;
+  color: #20352b;
+  font: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #3f8f63;
+  box-shadow: 0 0 0 3px rgba(63, 143, 99, 0.16);
+}
+
+form p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+button {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+form button[type="submit"] {
+  background: #2f7d52;
+  color: #ffffff;
+}
+
+form button[type="submit"]:hover {
+  background: #256743;
+}
+
+form button[type="button"],
+.auth-container > button {
+  background: #ffffff;
+  border-color: #b9cdbf;
+  color: #2f6847;
+}
+
+form button[type="button"]:hover,
+.auth-container > button:hover {
+  background: #f0f7f2;
+  border-color: #2f7d52;
+}
+
+.auth-container > button {
+  margin-top: 0.75rem;
+}
+
+.auth-container > p {
+  margin: 1.5rem 0 0;
+  color: #617268;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+a {
+  color: #2f7d52;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 30rem) {
+  :host {
+    padding: 0.75rem;
+  }
+
+  .auth-container {
+    margin: 1rem auto;
+  }
+}
